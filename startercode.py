@@ -151,7 +151,6 @@ def get_longest_lifespan_breed(cache_file):
         with open(cache_file, 'r') as f:
             cache = json.load(f)
     except:
-        cache_file = {}
         return "No breeds found"
     
     # Go through cache to get life.max value and breed name
@@ -191,8 +190,29 @@ def get_groups_above_cutoff(cutoff, cache_file):
     RETURNS:
         A dictionary {group_uuid: count} for groups with count >= cutoff only.
     """
-    pass
+    count = {}      # Dictionary for counting all group_uuids
+    out = {}        # Dictionary to output (limited to only groups with count >= cutoff)
 
+    # Open and load cache
+    try:
+        with open(cache_file, 'r') as f:
+            cache = json.load(f)
+    except:
+        return count
+    
+    # Go through cache to get group UUID string
+    for url, data in cache.items():
+        for d, breed in data.items():
+            group_id = breed.get('relationships', {}).get('group', {}).get('data', {}).get('id', None)
+            if group_id is not None:
+                count[group_id] = count.get(group_id, 0) + 1
+
+    # Go through count dictionary, keep only (key, value) pairs with count >= cutoff
+    for group_uuid, count in count.items():
+        if count >= cutoff:
+            out[group_uuid] = count
+
+    return out
 
 # Extra Credit
 def recommend_breeds_in_same_group(breed_name, cache_file):
