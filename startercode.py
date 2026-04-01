@@ -236,23 +236,52 @@ def recommend_breeds_in_same_group(breed_name, cache_file):
             "No recommendations found based on '{breed_name}'."  (no other breeds in that group)
     """
     breed_list = []
+    group_id = ""
+    name = ""
 
     # Open and load cache
     with open(cache_file, 'r') as f:
         cache = json.load(f)
     
-    if cache == {}:
+    # Check case where cache is empty
+    if not cache:
         return "No breed data found in cache."
     
-    if breed_name not in cache:
-        return f"{breed_name} is not in the cache."
-    
-    # given a breed name, find the group id
-        # if group id not found return f"No group information available for {breed_name}."
-        # else look through all dog breed names and get list that has same group id
+    # Go through cache to get group UUID
+    name_found = False      # Check if name is found in cache
+    for url, data in cache.items():
+        for d, breed in data.items():
+            name = breed.get('attributes', {}).get('name', None)
 
-    # Return recommendations, if list is empty, return "No recommendations found based on '{breed_name}'."
-    return breed_list if breed_list is not [] else f"No recommendations found based on {breed_name}."
+            # If match, get group UUID, use .lower() to be case insensitive
+            if name.lower() == breed_name.lower():
+                name_found = True
+                group_id = breed.get('relationships', {}).get('group', {}).get('data', {}).get('id', None)
+
+    # Check case where breed name not found in cache    
+    if not name_found:
+        return f"'{breed_name}' is not in the cache."
+    
+    # Check case where group UUID does not exist
+    if group_id is None:
+        return f"No group information available for '{breed_name}'."
+                
+    # Go through cache to find all breed names with matching group UUID
+    for url, data in cache.items():
+        for d, breed in data.items():
+            id_search = breed.get('relationships', {}).get('group', {}).get('data', {}).get('id', None)
+            
+            # If match found, get name and add to list (excluding the target breed)
+            if id_search == group_id:
+                name = breed.get('attributes', {}).get('name', None)
+                if name and name.lower() != breed_name.lower():
+                    breed_list.append(name)
+    
+    # If list is empty, return "No recommendations found based on '{breed_name}'."
+    if not breed_list:
+        return f"No recommendations found based on '{breed_name}'."
+    
+    return sorted(breed_list) 
         
 
 
@@ -478,7 +507,6 @@ class TestHomeworkDogAPI(unittest.TestCase):
     # -------------------------
     # extra credit - uncomment tests below to evaluate extra credit function
     # -------------------------
-    """
     def test_recommend_breeds_in_same_group_empty_cache(self):
         create_cache({}, self.test_cache_file)
         self.assertEqual(
@@ -583,7 +611,7 @@ class TestHomeworkDogAPI(unittest.TestCase):
             recommend_breeds_in_same_group("breed a", self.test_cache_file),
             ["Breed B", "Breed Z"],
         )
-    """
+    
 
 
 if __name__ == "__main__":
