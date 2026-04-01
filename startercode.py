@@ -2,13 +2,13 @@
 # Your name: Ashni Pothineni
 # Your student id: 4559 8385
 # Your email: apothine@umich.edu
-# Who or what you worked with on this homework (including generative AI like ChatGPT):
+# Who or what you worked with on this homework (including generative AI like ChatGPT): n/a
 # If you worked with generative AI also add a statement for how you used it.
 # e.g.:
 # Asked ChatGPT for help debugging and understanding the JSON structure
 #
 # Did your use of GenAI on this assignment align with your goals and guidelines in your Gen AI contract? If not, why?
-#
+    # My use of GenAI on this assignment aligned with my goals and guidelines in my Gen AI contract.   
 # --- ARGUMENTS & EXPECTED RETURN VALUES PROVIDED --- #
 # --- SEE INSTRUCTIONS FOR FULL DETAILS ON METHOD IMPLEMENTATION --- #
 
