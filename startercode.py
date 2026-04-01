@@ -101,7 +101,34 @@ def update_cache(breed_ids, cache_file):
         A string: "Cached data for {percentage}% of breeds",
         where percentage = (successful_new_adds / len(breed_ids)) * 100.
     """
-    pass
+    successful_new_adds = 0
+
+    # Open and load cache, if missing {}
+    try:
+        with open(cache_file, 'r') as f:
+            cache = json.load(f)
+    except:
+        cache = {}
+
+    # Go through all breed_ids
+    for breed_id in breed_ids:
+        url = f"https://dogapi.dog/api/v2/breeds/{breed_id}"
+
+        # Only make requests to urls not in cache
+        if url not in cache:
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                cache[url] = response.json()
+                successful_new_adds += 1
+
+    # After processing all ids, save updated cache
+    with open(cache_file, 'w') as f:
+        json.dump(cache, f)
+
+    # Calculate and return percentage
+    percentage = (successful_new_adds / len(breed_ids)) * 100
+    return f"Cached data for {percentage}% of breeds"
 
 
 def get_longest_lifespan_breed(cache_file):
