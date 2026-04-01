@@ -60,7 +60,8 @@ def create_cache(dictionary, filename):
     RETURNS:
         None
     """
-    pass
+    with open(filename, 'w') as f:
+        json.dump(dictionary, f)
 
 
 def search_breed(breed_id):
